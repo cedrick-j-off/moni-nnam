@@ -1,0 +1,112 @@
+/* Alliance : habillage culturel de la page, actif seulement quand le bàsàa est choisi.
+   content.js pose data-alliance-theme="basaa" sur <html> ; sans cet attribut, aucune règle ne s'applique.
+   Seule la présentation change (couleurs, images, police) : aucun texte, aucune valeur, aucun champ n'est touché.
+   Les couleurs propres au sens (erreur en rouge, succès en vert) sont laissées à la page.
+
+   Police : Andika (SIL International, licence OFL, fichiers dans fonts/), dessinée pour les
+   orthographes africaines : ɛ ɔ ŋ et tons combinés. Réduite aux alphabets latins, API et diacritiques.
+   Image (images/) : tissu-basaa.jpg, le tissu aux palmiers. */
+
+@font-face {
+  font-family: "Alliance Andika"; font-weight: 400; font-style: normal; font-display: swap;
+  src: url("chrome-extension://__MSG_@@extension_id__/themes/fonts/Andika-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Alliance Andika"; font-weight: 600 900; font-style: normal; font-display: swap;
+  src: url("chrome-extension://__MSG_@@extension_id__/themes/fonts/Andika-Bold.woff2") format("woff2");
+}
+
+/* ---------- Bàsàa : le bleu du tissu ----------
+   Une seule couleur, le bleu, en deux valeurs (bleu roi, bleu nuit). Le tissu n'apparaît qu'à deux endroits,
+   l'en-tête et la carte du solde, sous un dégradé bleu nuit. Le fond de la page est beige. */
+html[data-alliance-theme="basaa"] {
+  --al-font: "Alliance Andika", "Poppins", system-ui, sans-serif;
+  --al-ink: #0b1633;
+  --al-paper: #faf6ee;
+  --al-card: #ffffff;
+  --al-surface: #f2f5fb;
+  --al-line: #dde4f2;
+  --al-accent: #1246c8;
+  --al-accent-hover: #0e389f;
+  --al-accent-text: #1246c8;
+  --al-primary: #1246c8;
+  --al-primary-hover: #0e389f;
+  --al-primary-ink: #ffffff;
+  --al-deep: #0a1b4f;
+  --al-tissu: url("chrome-extension://__MSG_@@extension_id__/themes/images/tissu-basaa.jpg");
+  /* Dégradé bleu nuit, de haut en bas, posé sur le tissu : assez dense pour que le texte blanc reste lisible. */
+  --al-voile: linear-gradient(to bottom, rgba(8, 22, 72, .74) 0%, rgba(6, 15, 52, .95) 100%);
+}
+html.dark[data-alliance-theme="basaa"] { --al-accent: #2f66f0; --al-accent-hover: #4a7bf5; --al-accent-text: #8fb0ff; }
+
+/* ---------- Police ---------- */
+/* Tout le texte de l'application, sauf les numéros en chasse fixe (font-mono garde sa police). */
+html[data-alliance-theme] #app,
+html[data-alliance-theme] #app .font-sans { font-family: var(--al-font); }
+
+/* ---------- Fond de page : beige uni (mode clair seulement ; en mode sombre, la page garde ses fonds) ---------- */
+html[data-alliance-theme]:not(.dark) #app .min-h-screen.bg-slate-100 {
+  background-color: var(--al-paper);
+  color: var(--al-ink);
+}
+html[data-alliance-theme]:not(.dark) #app .text-slate-900 { color: var(--al-ink); }
+html[data-alliance-theme]:not(.dark) #app .border-slate-200 { border-color: var(--al-line); }
+html[data-alliance-theme]:not(.dark) #app .bg-slate-50 { background-color: var(--al-surface); }
+
+/* Cartes : blanches sur le fond beige, avec un filet discret et une ombre légère. */
+html[data-alliance-theme]:not(.dark) #app .rounded-3xl.border {
+  border-color: #ece4d3;
+  box-shadow: 0 6px 24px rgba(60, 42, 10, .08);
+}
+html[data-alliance-theme]:not(.dark) #app .rounded-3xl.border.bg-white { background-color: var(--al-card); }
+
+/* ---------- Bandeau « environnement de test » : bleu nuit uni, texte blanc ---------- */
+html[data-alliance-theme] #app [class~="bg-[#FFEB3B]"]:not(.rounded-full) {
+  background: var(--al-deep);
+  color: #ffffff;
+}
+
+/* ---------- En-tête « Safinum Pay » : le tissu sous le voile bleu nuit ---------- */
+html[data-alliance-theme] #app header.rounded-3xl {
+  background-color: var(--al-deep);
+  background-image: var(--al-voile), var(--al-tissu);
+  background-size: cover;
+  background-position: center 38%;
+  color: #ffffff;
+}
+html[data-alliance-theme] #app header.rounded-3xl .text-slate-500 { color: rgba(255, 255, 255, .72); }
+html[data-alliance-theme] #app header.rounded-3xl .border-slate-200 { border-color: rgba(255, 255, 255, .32); }
+html[data-alliance-theme] #app header.rounded-3xl button.text-slate-600 { color: #ffffff; }
+html[data-alliance-theme] #app header.rounded-3xl button.text-slate-600:hover { background-color: rgba(255, 255, 255, .14); }
+html[data-alliance-theme] #app header.rounded-3xl [class~="bg-[#00BFFF]/15"] { background-color: rgba(255, 255, 255, .16); color: #ffffff; }
+html[data-alliance-theme] #app header.rounded-3xl [class~="bg-[#2D1B69]"] { background-color: #ffffff; color: var(--al-deep); }
+
+/* ---------- Carte du solde : le tissu sous le voile bleu nuit ---------- */
+html[data-alliance-theme] #app [class~="from-[#2D1B69]"] {
+  background-color: var(--al-deep);
+  background-image: var(--al-voile), var(--al-tissu);
+  background-size: cover;
+  background-position: center;
+}
+
+/* ---------- Bouton principal (jaune sur la page) ---------- */
+html[data-alliance-theme] #app .rounded-full[class~="bg-[#FFEB3B]"] {
+  background-color: var(--al-primary);
+  color: var(--al-primary-ink);
+}
+html[data-alliance-theme] #app .rounded-full[class~="bg-[#FFEB3B]"]:hover { background-color: var(--al-primary-hover); }
+
+/* ---------- Couleur d'accent (bleu ciel sur la page) : étapes, intitulés, icônes, boutons pleins ---------- */
+html[data-alliance-theme] #app [class~="text-[#00BFFF]"] { color: var(--al-accent-text); accent-color: var(--al-accent); }
+html[data-alliance-theme] #app [class~="bg-[#00BFFF]"] { background-color: var(--al-accent); }
+html[data-alliance-theme] #app [class~="bg-[#00BFFF]"]:hover { background-color: var(--al-accent-hover); }
+html[data-alliance-theme] #app [class~="bg-[#00BFFF]/15"],
+html[data-alliance-theme] #app [class~="bg-[#00BFFF]/10"] { background-color: color-mix(in srgb, var(--al-accent) 10%, transparent); }
+html[data-alliance-theme] #app [class~="focus:border-[#00BFFF]/60"]:focus {
+  border-color: color-mix(in srgb, var(--al-accent) 60%, transparent);
+  --tw-ring-color: color-mix(in srgb, var(--al-accent) 30%, transparent);
+}
+html[data-alliance-theme] #app [class~="focus:ring-[#00BFFF]"]:focus { --tw-ring-color: var(--al-accent); }
+
+/* Pastille des initiales (hors en-tête). */
+html[data-alliance-theme] #app [class~="bg-[#2D1B69]"] { background-color: var(--al-deep); }

@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Moni Nnam - langues nationales",
+  "version": "0.11.0",
+  "description": "Affiche une interface financière dans la langue choisie à partir de fichiers d'équivalences locaux.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "http://127.0.0.1:11434/*"
+  ],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://safinum.cm/hackathon-test",
+        "https://safinum.cm/hackathon-test/*"
+      ],
+      "js": ["engine.js", "signal.js", "content.js"],
+      "css": ["themes/themes.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["locales/*.json", "audio/*", "themes/fonts/*", "themes/images/*"],
+      "matches": ["https://safinum.cm/*"]
+    }
+  ]
+}
