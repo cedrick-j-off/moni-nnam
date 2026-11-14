@@ -3,6 +3,8 @@
 Usage : python outils/generer_locales.py <HackathonTest-xxxx.js> extension/locales
 
 - fr et en viennent du code de la page (textes exacts).
+- eton vient de liste-traduction-eton.txt, la copie du cahier du locuteur éton
+  (mêmes numéros que la liste bàsàa). Voir la section ÉTON plus bas pour les retouches.
 - basaa vient de bassa.txt, les traductions du locuteur reçues le 14 novembre 2026 : une ligne
   « numéro - texte » par phrase de liste-traduction-basaa.txt. Voir la section BASAA plus bas
   pour les seules retouches faites (valeurs remises en variables, nom « Safinum Pay »).
@@ -91,19 +93,42 @@ BASAA["Numéro de compte : {numero_compte}"] = reponses[26].replace("CM 001 2345
 BASAA["Frais de {taux} % (min. {min} FCFA, max. {max} FCFA)"] = \
     "Disii di mapémés {taux} % (ndég yosô FCFA {min} ; ngandag yosô FCFA {max})"
 
-basaa = {}
+# ---------- ÉTON : traductions du cahier du locuteur ----------
+# liste-traduction-eton.txt, à la racine du projet : copie du cahier, mêmes numéros que la liste bàsàa.
+# Pour corriger l'éton, modifier la ligne « Éton : » de ce fichier puis relancer ce script.
+texte_eton = open(os.path.join(RACINE, "liste-traduction-eton.txt"), encoding="utf-8-sig").read()
+eton_num = {int(n): norm(t.replace("[?]", "")) for n, t in
+            re.findall(r"^\s*(\d+)\. Français : .*\n\s+Éton : (.*)$", texte_eton, flags=re.M)}
+assert sorted(eton_num) == list(range(1, 73)), "la liste éton doit avoir les 72 phrases"
+
+# Retouches, toutes pour respecter « ne jamais modifier un nom ou une valeur » :
+#  - 13 : la liste ne reprend pas le nom de l'application ; il est remis en tête, comme sur la page ;
+#  - 25, 26, 40 : le prénom, le numéro de compte, le taux et les bornes redeviennent des variables,
+#    recopiées depuis la page ; en 26 le cahier ne donne que le libellé, le numéro est ajouté après ;
+#  - 51 : le cahier propose deux mots séparés par « / » ; le premier est gardé en attendant un choix.
+assert eton_num[25].endswith("Amina") and "/" in eton_num[51], (eton_num[25], eton_num[51])
+assert eton_num[40] == "tàŋ i 1,5 % (àsí 100 FCFA, adɔp 2 500 FCFA)", eton_num[40]
+eton_num[13] = "Safinum Pay — " + eton_num[13]
+eton_num[51] = eton_num[51].split("/")[0].strip()
+ETON = {liste[n]: eton_num[n] for n in liste}
+ETON["Bonjour, {prenom}"] = eton_num[25].replace("Amina", "{prenom}")
+ETON["Numéro de compte : {numero_compte}"] = eton_num[26] + " : {numero_compte}"
+ETON["Frais de {taux} % (min. {min} FCFA, max. {max} FCFA)"] = "tàŋ i {taux} % (àsí {min} FCFA, adɔp {max} FCFA)"
+
+basaa, eton = {}, {}
 missing = sorted({f for f in fr.values() if norm(f) not in BASAA and f != "Safinum Pay"})
 assert not missing, missing
 for key, f in fr.items():
     if f == "Safinum Pay":
-        basaa[key] = f
+        basaa[key] = eton[key] = f
         continue
     basaa[key] = BASAA[norm(f)]
+    eton[key] = ETON[norm(f)]
 
 # une variable présente dans la source doit l'être dans chaque langue
 for key, f in fr.items():
     vars_ = set(re.findall(r"\{(\w+)\}", f))
-    for name, table in (("en", en), ("basaa", basaa)):
+    for name, table in (("en", en), ("basaa", basaa), ("eton", eton)):
         assert set(re.findall(r"\{(\w+)\}", table[key])) == vars_, (name, key)
         assert table[key].strip(), (name, key)
 
@@ -116,6 +141,9 @@ index = {
         {"code": "en", "nom": "English", "fichier": "en.json", "voix": "en-US", "statut": "source"},
         {"code": "basaa", "nom": "Bàsàa", "fichier": "basaa.json", "audio": "audio/basaa.json", "theme": "basaa",
          "statut": "Traductions fournies par le locuteur bàsàa le 14 novembre 2026."},
+        {"code": "eton", "nom": "Eton", "fichier": "eton.json", "audio": "audio/eton.json", "theme": "eton", "police": True,
+         "etiquette": "à confirmer",
+         "statut": "Traductions copiées du cahier du locuteur éton ; plusieurs lignes restent à vérifier avec lui."},
     ],
     "variables": {
         "prenom": "\\p{Lu}[\\p{L}'’-]*(?: \\p{Lu}[\\p{L}'’-]*){0,3}",
@@ -132,6 +160,6 @@ def dump(name, obj):
         json.dump(obj, f, ensure_ascii=False, indent=2)
         f.write("\n")
 dump("index.json", index)
-for name, table in (("fr", fr), ("en", en), ("basaa", basaa)):
+for name, table in (("fr", fr), ("en", en), ("basaa", basaa), ("eton", eton)):
     dump(name + ".json", table)
 print(len(fr), "cles par langue,", len(set(fr.values())), "textes francais uniques")

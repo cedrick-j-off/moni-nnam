@@ -19,8 +19,11 @@ Après une modification des fichiers, cliquer sur « Recharger » dans la page d
 | Français | `locales/fr.json` | textes exacts de la page |
 | English | `locales/en.json` | textes exacts de la page |
 | Bàsàa | `locales/basaa.json` | traductions du locuteur (`bassa.txt`, 14 novembre 2026) |
+| Eton | `locales/eton.json` | copie du cahier du locuteur (`liste-traduction-eton.txt`), plusieurs lignes à vérifier ; étiquette « à confirmer » dans le panneau |
 
 Le bàsàa reprend les 72 traductions du locuteur, lues dans `bassa.txt` à la racine du projet. Seules retouches : le nom « Safinum Pay » rétabli (écrit « Safinum pay »), et, dans la description des frais, les chiffres recopiés depuis la page (le locuteur avait écrit « 15% » pour « 1,5 % »).
+
+L'éton reprend les 72 phrases copiées du cahier du locuteur, avec les mêmes numéros que la liste bàsàa. Retouches : le nom « Safinum Pay » remis en tête de la mention de bas de page, le prénom, le numéro de compte et les chiffres des frais recopiés depuis la page, et, pour « Téléphone », le premier des deux mots proposés (« telefon »). Les lignes marquées [?] dans la liste sont celles dont la lecture du cahier est incertaine. Les lettres de l'éton (ɔ, ɛ, ə, ŋ, tons) s'affichent dans la police Andika livrée avec l'extension.
 
 ## Comment ça marche
 
@@ -34,11 +37,11 @@ Le bàsàa reprend les 72 traductions du locuteur, lues dans `bassa.txt` à la r
 
 Une valeur écrite `{nom}` dans un fichier de langue marque une variable, par exemple `"Bonjour, {prenom}"` ou `"Frais de {taux} % (min. {min} FCFA, max. {max} FCFA)"`. Le texte autour est traduit ; la valeur est recopiée à l'identique. La forme autorisée de chaque variable est définie dans `locales/index.json`.
 
-### Écoute en bàsàa
+### Écoute en bàsàa et en éton
 
-Les enregistrements du locuteur sont dans `audio/basaa/`, nommés « numéro - phrase française » ; les numéros sont ceux des 72 phrases de `liste-traduction-basaa.txt`. Un fichier déposé sous le seul nom « numéro.ext » est renommé par le script. `audio/basaa.json` associe chaque clé de l'interface à son fichier ; il est produit par `python outils/generer_audio.py`, à relancer après tout ajout ou renommage d'enregistrement. Quand plusieurs prises existent, celle dont le nom ne porte pas « (prise N) » est jouée.
+Les enregistrements des locuteurs sont dans `audio/basaa/` et `audio/eton/`, nommés « numéro - phrase française » ; les numéros sont ceux des 72 phrases de `liste-traduction-basaa.txt`. Un fichier déposé sous le seul nom « numéro.ext » est renommé par le script. En éton, 49 notes vocales (phrases 1 à 49) ont été rattachées par leur numéro ; les phrases 50 à 72 n'ont pas encore de voix. `audio/basaa.json` et `audio/eton.json` associent chaque clé de l'interface à son fichier ; ils sont produits par `python outils/generer_audio.py`, à relancer après tout ajout ou renommage d'enregistrement. Quand plusieurs prises existent, celle dont le nom ne porte pas « (prise N) » est jouée.
 
-En bàsàa, un bouton haut-parleur apparaît à côté du texte survolé ou atteint au clavier s'il a un enregistrement ; un appui lance l'écoute, un second l'arrête. Le bouton est dessiné hors du contenu de la page. Un enregistrement qui prononce une valeur (« Bonjour, Amina », le numéro de compte) n'est proposé que si la page affiche exactement cette valeur.
+En bàsàa et en éton, un bouton haut-parleur apparaît à côté du texte survolé ou atteint au clavier s'il a un enregistrement ; un appui lance l'écoute, un second l'arrête. Le bouton est dessiné hors du contenu de la page. Un enregistrement qui prononce une valeur (« Bonjour, Amina », le numéro de compte) n'est proposé que si la page affiche exactement cette valeur.
 
 Le panneau propose aussi « Lire toute la page » : les enregistrements des textes de l'écran s'enchaînent dans l'ordre de la page, un cadre suit le texte en cours de lecture, et la page défile si besoin. Un second appui ou la touche Échap arrête la lecture. Les valeurs (montants, noms, numéros) n'ont pas d'enregistrement et ne sont pas lues. Le bouton n'apparaît que pour une langue qui a des enregistrements.
 
@@ -48,17 +51,18 @@ Pour que la voix ait le même rendu d'un texte à l'autre, `signal.js` mesure ch
 
 ### Thèmes culturels
 
-Choisir le bàsàa change aussi l'habillage de la page : couleurs, images et police. Le français, l'anglais et la page d'origine gardent l'apparence de la page.
+Choisir le bàsàa ou l'éton change aussi l'habillage de la page : couleurs, images et police. Le français, l'anglais et la page d'origine gardent l'apparence de la page.
 
 | Langue | Thème | Couleurs | Images | Police |
 |---|---|---|---|---|
 | Bàsàa | `basaa` | le bleu, en deux valeurs : bleu roi et bleu nuit | le tissu aux palmiers sur l'en-tête et la carte du solde, sous un dégradé bleu nuit de haut en bas ; fond de page beige | Andika |
+| Eton | `eton` | le marron, en deux valeurs : marron et marron sombre | le tissu léopard sur l'en-tête et la carte du solde, sous un dégradé marron sombre de haut en bas ; fond de page beige | Andika |
 
 - La clé `theme` de chaque langue dans `locales/index.json` désigne son thème. `content.js` la recopie dans l'attribut `data-alliance-theme` de `<html>`, et `themes/themes.css` ne s'applique que sous cet attribut.
 - Chaque thème est un jeu de variables `--al-*` (couleurs, images, police). Le panneau de l'extension les hérite aussi.
 - Seule la présentation change. Les textes, les valeurs et les champs restent intacts, tout comme les couleurs qui ont un sens (rouge pour une erreur, vert pour un succès). En mode sombre, la page garde ses fonds, mais les accents, les deux zones de tissu et la police changent.
 - La police est livrée dans `themes/fonts/` et n'est pas téléchargée. Andika vient de SIL International et a été dessinée pour les orthographes africaines (ɛ, ɔ, ŋ, tons combinés). Elle est réduite aux alphabets latins, à l'API et aux diacritiques, sous licence OFL (`themes/fonts/OFL-andika.txt`).
-- L'image du tissu est dans `themes/images/tissu-basaa.jpg`.
+- Les images des tissus sont dans `themes/images/` : `tissu-basaa.jpg` et `tissu-eton.jpg`.
 - Le bouton rond de l'extension, en haut à droite, et son panneau prennent les couleurs et la police du thème.
 
 ### Ce qui n'est jamais modifié

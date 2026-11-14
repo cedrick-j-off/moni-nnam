@@ -561,6 +561,11 @@
     const theme = (index.langues.find((language) => language.code === currentLanguage) || {}).theme;
     if (theme) document.documentElement.dataset.allianceTheme = theme;
     else delete document.documentElement.dataset.allianceTheme;
+    // « police » dans index.json : la langue utilise des lettres (ɔ, ɛ, ə, ŋ, tons) que la police de la page
+    // n'a pas. Le texte passe alors dans la police livrée avec l'extension, sans autre changement d'aspect.
+    const needsFont = Boolean((index.langues.find((language) => language.code === currentLanguage) || {}).police);
+    if (needsFont) document.documentElement.dataset.alliancePolice = "1";
+    else delete document.documentElement.dataset.alliancePolice;
     hideSpeaker();
     withoutEcho(() => processTree(document.body, false));
     updatePanel();

@@ -2,7 +2,7 @@
 
 Extension de navigateur (Chrome et Edge) qui affiche et fait entendre un service financier numérique en langues nationales camerounaises, **sans modifier le service**. Prototype réalisé pour l'épreuve de présélection du SAFINUM Innovate Challenge.
 
-- **Langue nationale** : bàsàa, en texte et en voix (enregistrements d'un locuteur), avec un habillage de la page inspiré de la culture bàsàa.
+- **Langues nationales** : bàsàa et éton, en texte et en voix (enregistrements de locuteurs). En bàsàa, la page prend aussi un habillage inspiré de la culture bàsàa.
 - **Langues source** : français et anglais, avec lecture par la voix de synthèse de l'appareil.
 - **Principe** : chaque texte reconnu est remplacé par un équivalent préparé à l'avance ; rien n'est traduit automatiquement. Un texte inconnu est laissé tel quel.
 - **Valeurs protégées** : montants, frais, noms, numéros, références et codes d'erreur ne sont jamais réécrits.
@@ -14,7 +14,7 @@ Extension de navigateur (Chrome et Edge) qui affiche et fait entendre un service
 2. Ouvrir `chrome://extensions` ou `edge://extensions` et activer le mode développeur.
 3. Cliquer sur « Charger l'extension non empaquetée » et choisir le dossier `extension`.
 4. Ouvrir <https://safinum.cm/hackathon-test>.
-5. Cliquer sur le bouton rond de l'extension (globe), en haut à droite, choisir Bàsàa.
+5. Cliquer sur le bouton rond de l'extension (globe), en haut à droite, choisir Bàsàa ou Eton.
 6. Survoler un texte et cliquer sur le haut-parleur pour l'écouter, ou cliquer sur « Lire toute la page ».
 
 ## Contenu du dépôt
@@ -26,6 +26,7 @@ Extension de navigateur (Chrome et Edge) qui affiche et fait entendre un service
 | [outils/](outils/) | Scripts de génération des fichiers de langue et des tables audio, tests, analyse des enregistrements. |
 | [liste-traduction-basaa.txt](liste-traduction-basaa.txt) | Les 72 phrases de l'interface, numérotées, remises aux locuteurs. |
 | [bassa.txt](bassa.txt) | Les traductions bàsàa du locuteur. |
+| [liste-traduction-eton.txt](liste-traduction-eton.txt) | Les traductions éton, copiées du cahier, avec les lignes à vérifier. |
 | [phrases-interface.json](phrases-interface.json) | Inventaire des textes de la page de test et suivi des traductions. |
 
 ## Tests
@@ -41,11 +42,11 @@ Le second test parcourt la page de test officielle dans un navigateur sans fenê
 
 ## État et limites
 
-L'état de validation de chaque langue et les limites connues sont décrits sans détour dans [livrables/3-langues-et-validation.md](livrables/3-langues-et-validation.md) et [livrables/2-note-technique.md](livrables/2-note-technique.md). En résumé : le bàsàa vient d'un locuteur mais n'a pas eu de seconde relecture, et un message inédit n'est pas traduit.
+L'état de validation de chaque langue et les limites connues sont décrits sans détour dans [livrables/3-langues-et-validation.md](livrables/3-langues-et-validation.md) et [livrables/2-note-technique.md](livrables/2-note-technique.md). En résumé : le bàsàa vient d'un locuteur mais n'a pas eu de seconde relecture, l'éton est une copie du cahier du locuteur dont plusieurs lignes restent à vérifier et dont 49 phrases sur 72 ont une voix, et un message inédit n'est pas traduit.
 
 ## Sources et composants tiers
 
 - *Dictionnaire français-basaa*, Dr Pierre Emmanuel Njock, 2005 : consulté pendant le prototypage, non reproduit dans ce dépôt.
 - Police Andika, SIL International, licence SIL Open Font License 1.1 : version réduite dans `extension/themes/fonts/`.
 - Claude (Anthropic) : assistance à l'écriture du code et de la documentation.
-- Les enregistrements audio sont la voix d'un locuteur bàsàa ; ils ne peuvent pas être réutilisés sans son accord.
+- Les enregistrements audio sont les voix de locuteurs bàsàa et éton ; ils ne peuvent pas être réutilisés sans leur accord.

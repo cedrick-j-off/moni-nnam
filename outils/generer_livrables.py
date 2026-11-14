@@ -46,6 +46,7 @@ A_COMPLETER = "à compléter"
 equipe = identite.get("equipe") or A_COMPLETER
 representant = identite.get("representant") or A_COMPLETER
 locuteur = identite.get("locuteur_basaa") or A_COMPLETER
+aide_eton = identite.get("aide_eton") or A_COMPLETER
 version = json.loads((RACINE / "extension" / "manifest.json").read_text(encoding="utf-8"))["version"]
 
 PARTIES = [
@@ -57,7 +58,8 @@ FIGURE = f"""
 <figure>
   <div class="captures">
     <div><img src="{(LIVRABLES / 'images' / 'page-origine.png').as_uri()}" alt=""><p>La page de test, telle que le service l'affiche.</p></div>
-    <div><img src="{(LIVRABLES / 'images' / 'page-basaa.png').as_uri()}" alt=""><p>La même page avec Moni Nnam, en bàsàa. Le solde et le numéro de compte sont identiques.</p></div>
+    <div><img src="{(LIVRABLES / 'images' / 'page-basaa.png').as_uri()}" alt=""><p>La même page avec Moni Nnam, en bàsàa.</p></div>
+    <div><img src="{(LIVRABLES / 'images' / 'page-eton.png').as_uri()}" alt=""><p>En éton. Le solde et le numéro de compte ne changent jamais.</p></div>
   </div>
 </figure>
 """
@@ -67,7 +69,7 @@ def partie(fichier, numero, titre):
     texte = (LIVRABLES / fichier).read_text(encoding="utf-8")
     # Le titre et les deux lignes d'en-tête de chaque document sont remplacés par la page de garde.
     texte = re.sub(r"\A# .*\n\n\*\*SAFINUM.*\n.*\n", "", texte)
-    texte = texte.replace("[nom du locuteur bàsàa]", locuteur).replace("[nom de l'équipe]", equipe)
+    texte = texte.replace("[nom du locuteur bàsàa]", locuteur).replace("[personne ayant aidé à la traduction éton]", aide_eton).replace("[nom de l'équipe]", equipe)
     # Dans le PDF, les trois documents sont les parties d'un seul : les renvois le disent.
     texte = texte.replace("(voir « Langues et validation linguistique »)", "(voir la partie 3)")
     # Les sections déjà numérotées (« ## 1. Architecture ») perdent leur numéro : la partie porte le sien.
@@ -104,7 +106,7 @@ th { font-weight: bold; }
 tr { page-break-inside: avoid; }
 code { font: 10pt "Courier New", monospace; }
 figure { margin: 5mm 0 3mm; page-break-inside: avoid; }
-.captures { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+.captures { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm; }
 .captures img { width: 100%; display: block; border: 1px solid #888; }
 .captures p { font-size: 10pt; font-style: italic; margin: 1.5mm 0 0; text-align: left; }
 """
@@ -114,7 +116,7 @@ document = f"""<!doctype html><html lang="fr"><head><meta charset="utf-8"><title
   <div class="haut">SAFINUM Innovate Challenge<br>Épreuve de présélection</div>
   <div>
     <h1>Moni Nnam</h1>
-    <p class="accroche">Une extension de navigateur qui affiche et fait entendre un service financier en bàsàa, sans modifier le service</p>
+    <p class="accroche">Une extension de navigateur qui affiche et fait entendre un service financier en bàsàa et en éton, sans modifier le service</p>
     <p class="contenu">Description de la solution, note technique et identification linguistique</p>
   </div>
   <div class="bas">
@@ -142,7 +144,7 @@ print(f"{pdf.name} : {len(PdfReader(str(pdf)).pages)} pages, {pdf.stat().st_size
 NOTICE = f"""Moni Nnam - prototype (version {version})
 Équipe {equipe}
 
-Extension pour Chrome et Edge. Elle affiche et fait entendre en bàsàa la page de test
+Extension pour Chrome et Edge. Elle affiche et fait entendre en bàsàa et en éton la page de test
 https://safinum.cm/hackathon-test, sans modifier cette page.
 
 INSTALLATION
@@ -153,7 +155,8 @@ INSTALLATION
 
 UTILISATION
 - Cliquer sur le bouton rond de l'extension (un globe), en haut à droite de la page.
-- Choisir « Bàsàa » : les textes et l'habillage de la page changent aussitôt.
+- Choisir « Bàsàa » ou « Eton » : les textes et l'habillage de la page changent aussitôt.
+  L'éton porte la mention « à confirmer » : sa version n'est pas terminée.
 - Survoler un texte puis cliquer sur le haut-parleur pour l'écouter,
   ou cliquer sur « Lire toute la page » dans le panneau.
 - « Page d'origine » rend à la page son apparence et ses textes.

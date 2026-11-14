@@ -1,13 +1,13 @@
 # Moni Nnam — note technique
 
 **SAFINUM Innovate Challenge — épreuve de présélection**
-Version du prototype : 0.11.0 — Équipe : Moni Nnam
+Version du prototype : 0.12.0 — Équipe : Moni Nnam
 
 ## Architecture
 
 Moni Nnam est une extension de navigateur au format Manifest V3, pour Chrome et Edge. Elle fonctionne entièrement dans le navigateur de l'utilisateur. Il n'y a pas de serveur, pas de compte à créer et aucun appel réseau.
 
-Le fonctionnement tient en trois temps. Un script injecté dans la page parcourt les textes affichés. Pour chacun, il interroge un petit moteur de correspondance qui retrouve le texte source, en français ou en anglais, et renvoie son équivalent en bàsàa. Le script remplace alors le texte à l'écran et continue de surveiller la page, pour traiter tout ce qui apparaît ensuite.
+Le fonctionnement tient en trois temps. Un script injecté dans la page parcourt les textes affichés. Pour chacun, il interroge un petit moteur de correspondance qui retrouve le texte source, en français ou en anglais, et renvoie son équivalent dans la langue choisie. Le script remplace alors le texte à l'écran et continue de surveiller la page, pour traiter tout ce qui apparaît ensuite.
 
 Chaque texte reconnu porte une clé, et c'est cette clé qui le relie à son enregistrement. La voix et le texte ne peuvent donc pas se décaler : une phrase affichée a toujours la voix qui lui correspond, ou pas de voix du tout.
 
@@ -17,21 +17,21 @@ Chaque texte reconnu porte une clé, et c'est cette clé qui le relie à son enr
 | `locales/<langue>.json` | Une table clé → texte par langue, avec les mêmes 82 clés partout. Une valeur vide signifie que le texte de la page est laissé tel quel. |
 | `engine.js` | Le moteur de correspondance. Il n'a accès ni à la page ni au réseau. |
 | `content.js` | Le script de page. Il remplace les textes reconnus et quatre attributs de libellé (`aria-label`, `title`, `placeholder`, `alt`), observe les changements, mémorise la langue choisie et dessine le bouton, le panneau et le haut-parleur. |
-| `audio/basaa.json` et `audio/basaa/` | Les enregistrements du locuteur et la table qui relie chaque clé à son fichier. |
+| `audio/<langue>.json` et `audio/<langue>/` | Les enregistrements de chaque langue et la table qui relie chaque clé à son fichier. |
 | `signal.js` | L'analyse du son au moment de l'écoute : elle écarte les silences de début et de fin et ramène toutes les voix au même niveau. Les fichiers ne sont pas modifiés. |
-| `themes/` | La feuille de style du thème bàsàa, l'image du tissu et la police. Elle ne s'applique que lorsque le bàsàa est choisi. |
+| `themes/` | La feuille de style des thèmes, les images des deux tissus et la police. Un thème ne s'applique que lorsque sa langue est choisie. |
 
 Certains textes mélangent un libellé et des valeurs, par exemple « Frais de 1,5 % (min. 100 FCFA, max. 2 500 FCFA) ». Pour ces cas, le fichier de langue contient un gabarit, `Frais de {taux} % (min. {min} FCFA, max. {max} FCFA)`. Le moteur traduit le libellé et recopie chaque valeur à l'identique. S'il ne retrouve pas toutes les valeurs dans le résultat, il ne remplace rien.
 
 ## L'écoute
 
-L'écoute est la fonction principale de l'extension, puisqu'elle s'adresse à des personnes qui parlent le bàsàa sans le lire.
+L'écoute est la fonction principale de l'extension, puisqu'elle s'adresse à des personnes qui parlent leur langue sans la lire.
 
 Les enregistrements sont de simples fichiers audio livrés avec l'extension, un par phrase. Quand l'utilisateur survole un texte ou y arrive au clavier, le script cherche l'enregistrement de sa clé et affiche le haut-parleur s'il existe. Le bouton « Lire toute la page » relève les textes de l'écran qui ont une voix, dans l'ordre de la page, et les joue l'un après l'autre. Un cadre suit la phrase en cours et la page défile si nécessaire. Un second clic ou la touche Échap arrête la lecture.
 
-Les fichiers reçus du locuteur n'ont pas tous le même volume, et certains commencent ou finissent par un silence. Plutôt que de les retoucher, nous les mesurons au moment de l'écoute. Le script repère où la voix commence et où elle finit, coupe les silences, et règle le gain pour ramener chaque phrase à −20 dBFS sans dépasser −1 dBFS en crête. L'intonation du locuteur n'est pas modifiée : ni la vitesse ni la hauteur de la voix ne sont touchées.
+Les fichiers reçus n'ont pas tous le même volume, et certains commencent ou finissent par un silence. Plutôt que de les retoucher, nous les mesurons au moment de l'écoute. Le script repère où la voix commence et où elle finit, coupe les silences, et règle le gain pour ramener chaque phrase à −20 dBFS sans dépasser −1 dBFS en crête. L'intonation du locuteur n'est pas modifiée : ni la vitesse ni la hauteur de la voix ne sont touchées.
 
-Les valeurs, c'est-à-dire les montants, les noms et les numéros, ne sont pas prononcées en bàsàa. Elles changent à chaque opération et n'ont pas d'enregistrement.
+Les valeurs, c'est-à-dire les montants, les noms et les numéros, ne sont pas prononcées. Elles changent à chaque opération et n'ont pas d'enregistrement.
 
 ## Intégration au service
 
@@ -57,9 +57,9 @@ La seule autorisation utile est `storage`, pour mémoriser la langue. Le manifes
 
 | Test | Ce qu'il vérifie | Résultat au 14 novembre 2026 |
 |---|---|---|
-| `node outils/tester_moteur.js` | 492 correspondances (82 clés, 3 langues, 2 langues source), les valeurs conservées dans les gabarits, les textes inconnus laissés intacts, la présence des fichiers audio. | 0 échec |
-| `node outils/tester_navigateur.js` | Un parcours complet sur la page de test officielle, dans Edge sans fenêtre : changement de langue, cinq étapes, alerte de sécurité, contenu ajouté après le chargement, bascule français/anglais, langue mémorisée, écoute d'un enregistrement, thème, journal d'intégrité de la page. | 0 échec, cinq étapes « intact » |
-| `node outils/analyser_audio.js` | La mesure des 72 enregistrements : durée, silences, niveau, crête, bruit. | Écart de niveau entre fichiers ramené de 7 dB à 0,4 dB |
+| `node outils/tester_moteur.js` | 656 correspondances (82 clés, 4 langues, 2 langues source), les valeurs conservées dans les gabarits, les textes inconnus laissés intacts, la présence des fichiers audio. | 0 échec |
+| `node outils/tester_navigateur.js` | Un parcours complet sur la page de test officielle, dans Edge sans fenêtre : changement de langue, cinq étapes, alerte de sécurité, contenu ajouté après le chargement, bascule français/anglais, langue mémorisée, écoute d'un enregistrement, thèmes bàsàa et éton, journal d'intégrité de la page. | 0 échec, cinq étapes « intact » |
+| `node outils/analyser_audio.js` | La mesure des 72 enregistrements bàsàa : durée, silences, niveau, crête, bruit. | Écart de niveau entre fichiers ramené de 7 dB à 0,4 dB |
 
 Nous n'avons pas encore testé le panneau jury de la page (`?jury=1`), le navigateur Chrome, un lecteur d'écran ni un écran tactile.
 
@@ -71,9 +71,9 @@ Nous n'avons pas encore testé le panneau jury de la page (`?jury=1`), le naviga
 | Aucune bibliothèque JavaScript | L'extension est écrite sans dépendance. | — |
 | Node.js 22 ou plus récent | Scripts de test uniquement. | — |
 | Python 3 | Scripts de préparation uniquement. | — |
-| Police Andika, SIL International | Police du thème bàsàa, livrée en version réduite. | SIL Open Font License 1.1 |
-| Image du tissu aux palmiers | Habillage de l'en-tête et de la carte du solde. | Image fournie par l'équipe |
-| *Dictionnaire français-basaa*, P. E. Njock, 2005 | Consulté au début du projet. Les textes actuels viennent du locuteur. | Licence non indiquée |
+| Police Andika, SIL International | Police des deux thèmes, livrée en version réduite. | SIL Open Font License 1.1 |
+| Images du tissu aux palmiers et du tissu léopard | Habillage de l'en-tête et de la carte du solde, en bàsàa et en éton. | Images fournies par l'équipe |
+| *Dictionnaire français-basaa*, P. E. Njock, 2005 | Consulté au début du projet. Les textes bàsàa actuels viennent du locuteur. | Licence non indiquée |
 | Claude (Anthropic) | Assistant de programmation, utilisé pour le code, les scripts et la mise en forme de la documentation. | Non embarqué dans l'extension |
 | Ollama, modèle Aya Expanse | Premier essai de traduction automatique locale, abandonné. | Ne sert plus |
 
@@ -85,13 +85,15 @@ Nous préférons les donner clairement.
 
 Un message qui n'est pas dans nos fichiers reste dans sa langue d'origine. C'est un choix de sécurité, mais cela veut dire que l'exigence sur le contenu inédit n'est couverte qu'en partie.
 
-Le bàsàa vient d'un locuteur, mais il n'a pas encore été relu par une seconde personne. Le texte affiché n'a pas non plus été comparé mot à mot aux enregistrements.
+La version éton n'est pas terminée. Les textes viennent d'un cahier manuscrit que nous avons recopié, et une trentaine de lignes sont à vérifier, surtout pour les tons. Seules les phrases 1 à 49 ont une voix : le reçu, la fin du récapitulatif et les messages d'erreur n'en ont pas encore. Les notes vocales ont été rattachées aux phrases par leur numéro, sans écoute de contrôle systématique.
+
+Le bàsàa vient d'un locuteur, mais il n'a pas encore été relu par une seconde personne. Dans les deux langues, le texte affiché n'a pas été comparé mot à mot aux enregistrements.
 
 La voix ne dit pas encore les montants, les noms ni les numéros. Une personne qui ne lit pas du tout les chiffres a donc toujours besoin d'aide pour cette partie. C'est la limite la plus importante par rapport à notre objectif, et la première que nous voulons lever.
 
-Sur 82 textes, 80 ont un enregistrement. Deux fichiers ne sont pas joués : « Bonjour, Amina », reçu sans son, et la description des frais, dont les chiffres prononcés doivent être vérifiés. L'analyse du son égalise le volume, mais elle ne corrige pas le bruit de fond.
+En bàsàa, 80 textes sur 82 ont un enregistrement. Deux fichiers ne sont pas joués : « Bonjour, Amina », reçu sans son, et la description des frais, dont les chiffres prononcés doivent être vérifiés. L'analyse du son égalise le volume, mais elle ne corrige pas le bruit de fond.
 
-L'habillage bàsàa est notre proposition. Il n'a pas encore été présenté à des membres de la communauté. En mode sombre, la page garde ses fonds et seuls les accents, le tissu et la police changent.
+Les deux habillages sont nos propositions. Ils n'ont pas encore été présentés à des membres des communautés concernées. En mode sombre, la page garde ses fonds et seuls les accents, les tissus et la police changent.
 
 La lecture en français et en anglais dépend des voix installées sur l'appareil. Sans voix locale, elle n'est pas proposée.
 

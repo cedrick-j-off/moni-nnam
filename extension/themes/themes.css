@@ -1,11 +1,11 @@
-/* Alliance : habillage culturel de la page, actif seulement quand le bàsàa est choisi.
-   content.js pose data-alliance-theme="basaa" sur <html> ; sans cet attribut, aucune règle ne s'applique.
+/* Alliance : habillage culturel de la page, actif seulement quand le bàsàa ou l'éton est choisi.
+   content.js pose data-alliance-theme="basaa" ou "eton" sur <html> ; sans cet attribut, aucune règle ne s'applique.
    Seule la présentation change (couleurs, images, police) : aucun texte, aucune valeur, aucun champ n'est touché.
    Les couleurs propres au sens (erreur en rouge, succès en vert) sont laissées à la page.
 
    Police : Andika (SIL International, licence OFL, fichiers dans fonts/), dessinée pour les
    orthographes africaines : ɛ ɔ ŋ et tons combinés. Réduite aux alphabets latins, API et diacritiques.
-   Image (images/) : tissu-basaa.jpg, le tissu aux palmiers. */
+   Images (images/) : tissu-basaa.jpg, le tissu aux palmiers ; tissu-eton.jpg, le tissu léopard. */
 
 @font-face {
   font-family: "Alliance Andika"; font-weight: 400; font-style: normal; font-display: swap;
@@ -15,6 +15,12 @@
   font-family: "Alliance Andika"; font-weight: 600 900; font-style: normal; font-display: swap;
   src: url("chrome-extension://__MSG_@@extension_id__/themes/fonts/Andika-Bold.woff2") format("woff2");
 }
+
+/* ---------- Police seule (éton) ----------
+   Une langue sans thème peut quand même demander la police : ses lettres (ɔ, ɛ, ə, ŋ, tons combinés)
+   manquent dans la police de la page. Rien d'autre ne change. */
+html[data-alliance-police] #app,
+html[data-alliance-police] #app .font-sans { font-family: "Alliance Andika", "Poppins", system-ui, sans-serif; }
 
 /* ---------- Bàsàa : le bleu du tissu ----------
    Une seule couleur, le bleu, en deux valeurs (bleu roi, bleu nuit). Le tissu n'apparaît qu'à deux endroits,
@@ -38,6 +44,28 @@ html[data-alliance-theme="basaa"] {
   --al-voile: linear-gradient(to bottom, rgba(8, 22, 72, .74) 0%, rgba(6, 15, 52, .95) 100%);
 }
 html.dark[data-alliance-theme="basaa"] { --al-accent: #2f66f0; --al-accent-hover: #4a7bf5; --al-accent-text: #8fb0ff; }
+
+/* ---------- Éton : le marron du tissu léopard ----------
+   Même construction que le thème bàsàa : une seule couleur, le marron, en deux valeurs.
+   Le tissu léopard habille l'en-tête et la carte du solde, sous un dégradé marron sombre. */
+html[data-alliance-theme="eton"] {
+  --al-font: "Alliance Andika", "Poppins", system-ui, sans-serif;
+  --al-ink: #21160c;
+  --al-paper: #faf6ee;
+  --al-card: #ffffff;
+  --al-surface: #f7f1e8;
+  --al-line: #e8dccb;
+  --al-accent: #7a4a1e;
+  --al-accent-hover: #5f3814;
+  --al-accent-text: #7a4a1e;
+  --al-primary: #7a4a1e;
+  --al-primary-hover: #5f3814;
+  --al-primary-ink: #ffffff;
+  --al-deep: #2e1a0b;
+  --al-tissu: url("chrome-extension://__MSG_@@extension_id__/themes/images/tissu-eton.jpg");
+  --al-voile: linear-gradient(to bottom, rgba(52, 29, 11, .72) 0%, rgba(28, 15, 5, .95) 100%);
+}
+html.dark[data-alliance-theme="eton"] { --al-accent: #a8692f; --al-accent-hover: #bd7a3c; --al-accent-text: #e0aa70; }
 
 /* ---------- Police ---------- */
 /* Tout le texte de l'application, sauf les numéros en chasse fixe (font-mono garde sa police). */

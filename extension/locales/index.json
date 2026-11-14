@@ -27,6 +27,16 @@
       "audio": "audio/basaa.json",
       "theme": "basaa",
       "statut": "Traductions fournies par le locuteur bàsàa le 14 novembre 2026."
+    },
+    {
+      "code": "eton",
+      "nom": "Eton",
+      "fichier": "eton.json",
+      "audio": "audio/eton.json",
+      "theme": "eton",
+      "police": true,
+      "etiquette": "à confirmer",
+      "statut": "Traductions copiées du cahier du locuteur éton ; plusieurs lignes restent à vérifier avec lui."
     }
   ],
   "variables": {
